@@ -1,0 +1,16 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "strict": true,
+        "skipLibCheck": true,
+        "experimentalDecorators": false,
+        "paths": {
+            "c/*": ["./*"]
+        }
+    },
+    "include": ["**/*.ts", "../../../../.sfdx/typings/lwc/**/*.d.ts"],
+    "exclude": ["node_modules", "**/__tests__/**"]
+}
