@@ -2,24 +2,37 @@ import { LightningElement } from 'lwc';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import TAILWIND from '@salesforce/resourceUrl/tailwind';
 
+type Constructor<T = object> = new (...args: unknown[]) => T;
+
 /**
  * Mixin that loads the compiled Tailwind CSS static resource
  * into a component's shadow root.
  *
- * Call once in connectedCallback(). Returns a Promise that
- * resolves when the stylesheet has been injected.
+ * Follows the Salesforce class-factory mixin pattern
+ * (same as NavigationMixin, CurrentPageReference, etc.).
  *
  * @example
- * import { useTailwind } from 'c/tailwindMixin';
+ * import { TailwindMixin } from 'c/tailwindMixin';
  *
- * export default class MyComponent extends LightningElement {
+ * export default class MyComponent extends TailwindMixin(LightningElement) {
  *     connectedCallback() {
- *         useTailwind(this);
+ *         super.connectedCallback();
+ *         // your own logic here
  *     }
  * }
  */
-export function useTailwind(component: LightningElement): Promise<void> {
-    return loadStyle(component, TAILWIND).catch((err: unknown) => {
-        console.error('[tailwindElement] Failed to load styles:', err);
-    });
-}
+export const TailwindMixin = <T extends Constructor<LightningElement>>(Base: T) => {
+    return class extends Base {
+        _tailwindLoaded = false;
+
+        connectedCallback(): void {
+            super.connectedCallback?.();
+            if (!this._tailwindLoaded) {
+                this._tailwindLoaded = true;
+                loadStyle(this, TAILWIND).catch((err: unknown) => {
+                    console.error('[tailwindMixin] Failed to load styles:', err);
+                });
+            }
+        }
+    };
+};
